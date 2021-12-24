@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Registration Form</title>
+    <link rel="stylesheet" href="f.css">
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.2.0/zxcvbn.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            // Countries starts here
+            var country_arr = new Array("Select Country", "AUSTRALIA", "INDIA", "NEW ZEALAND", "USA", "UAE", "MAURITIUS");
+
+            $.each(country_arr, function (i, item) {
+                $('#country').append($('<option>', {
+                    value: i,
+                    text: item,
+                }, '</option>'));
+            });
+
+            // States starts here
+            var s_a = new Array();
+            s_a[0] = "Select State";
+            s_a[1] = "Select State|QUEENSLAND|VICTORIA";
+            s_a[2] = "Select State|ANDHRAPRADESH|KARNATAKA|TAMILNADU|DELHI|GOA|GUJARAT|MADHYAPRADESH|RAJASTHAN";
+            s_a[3] = "Select State|AUCKLAND";
+            s_a[4] = "Select State|NEWJERSEY|ILLINOIS";
+            s_a[5] = "Select State|DUBAI";
+            s_a[6] = "Select State|MAURITIUS";
+
+
+            $('#country').change(function () {
+                var c = $(this).val();
+                var state_arr = s_a[c].split("|");
+                $('#state').empty();
+                if (c == 0) {
+                    $('#state').append($('<option>', {
+                        value: '0',
+                        text: 'Select State',
+                    }, '</option>'));
+                } else {
+                    $.each(state_arr, function (i, item_state) {
+                        $('#state').append($('<option>', {
+                            value: item_state,
+                            text: item_state,
+                        }, '</option>'));
+                    });
+                }
+            });
+
+        });
+
+
+
+        //age calculation
+        function myAgeValidation() {
+
+            var lre = /^\s*/;
+            var datemsg = "";
+
+            var inputDate = document.forms['vform']["txtDOB"].value
+            inputDate = inputDate.replace(lre, "");
+            document.vform.txtDOB.value = inputDate;
+            datemsg = isValidDate(inputDate);
+            if (datemsg != "") {
+                alert(datemsg);
+                return;
+            }
+            else {
+              
+                getAge(new Date(inputDate));
+            }
+
+        }
+
+        function getAge(birth) {
+
+            var today = new Date();
+            var nowyear = today.getFullYear();
+            var nowmonth = today.getMonth();
+            var nowday = today.getDate();
+
+            var birthyear = birth.getFullYear();
+            var birthmonth = birth.getMonth();
+            var birthday = birth.getDate();
+
+            var age = nowyear - birthyear;
+            var age_month = nowmonth - birthmonth;
+            var age_day = nowday - birthday;
+
+            if (age_month < 0 || (age_month == 0 && age_day < 0)) {
+                age = parseInt(age) - 1;
+            }
+            alert(age);
+
+            if ((age == 18 && age_month <= 0 && age_day <= 0) || age < 18) {
+            }
+            else {
+                alert("You have crossed your 18th birthday !");
+            }
+
+        }
+        function isValidDate(dateStr) {
+
+
+            var msg = "";
+    
+            var datePat = /^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d$/;
+
+            var matchArray = dateStr.match(datePat); // checks is the format ok?
+            if (matchArray == null) {
+                msg = "Date is not in a valid format.";
+                return msg;
+            }
+
+            day = matchArray[1]; 
+            month = matchArray[3];
+            year = matchArray[4];
+
+
+            if (month < 1 || month > 12) { // check month range
+                msg = "Month must be between 1 and 12.";
+                return msg;
+            }
+
+            if (day < 1 || day > 31) {
+                msg = "Day must be between 1 and 31.";
+                return msg;
+            }
+
+            if ((month == 4 || month == 6 || month == 9 || month == 11) && day == 31) {
+                msg = "Month " + month + " doesn't have 31 days!";
+                return msg;
+            }
+
+            if (month == 2) { // check for february 29th for leap year
+                var isleap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+                if (day > 29 || (day == 29 && !isleap)) {
+                    msg = "February " + year + " doesn't have " + day + " days!";
+                    return msg;
+                }
+            }
+
+            if (day.charAt(0) == '0') day = day.charAt(1);
+
+            return msg;
+        }
+    </script>
+
+</head>
+
+<body>
+
+    <div id="wrapper">
+        <h1><u>Registration Form</u> </h1>
+        <form method="POST" action="/" onsubmit="return Validate()" name="vform">
+            <div id="username_div">
+                <label>Name</label> <br>
+                <input type="text" name="username" id="Name" class="textInput" placeholder="Enter your Name"><br>
+                <div id=" name_error">
+            </div>
+    </div>
+    <div id="email_div">
+        <label>Email</label> <br>
+        <input type="email" name="email" class="textInput" placeholder="Enter your Email"><br>
+        <div id="email_error"></div>
+    </div>
+    <div id="Phone">
+        <label>Phone</label> <br>
+        <input type="number" name="Phone" class="textInput" placeholder="Enter your Phone number"><br>
+        <div id="phone_error"></div>
+    </div>
+
+    <div id="dob_div">
+        <label for="txtDOB">DOB </label><br>
+        <input id="txtDOB" type="date" data-date-format="DD/MM/YYYY" name="txtDOB" onchange="myAgeValidation()"><br>
+        <div id="dob_error"></div>
+    </div>
+    <div>
+        <label for="age">Age </label><br>
+        <label id="age" type="age" name="age"></label><br>
+
+    </div>
+    <div>
+        <label for="country">Country </label><br>
+        <select name="country" id="country" class="textInput"></select> <br>
+    </div>
+    <div>
+        <label for="city">State </label><br>
+        <select name="state" id="state" class="textInput"></select> <br>
+    </div>
+
+    <div id="password_div">
+        <label>Password</label> <br>
+        <input type="password" name="password" id="password" class="textInput" placeholder="Format(Keshika@123)"><br>
+        <meter max="4" id="password-strength-meter"></meter>
+
+        <!--  <span id="StrengthDisp" class="badge displayBadge">Weak</span> -->
+        <br>
+        <div id="password_error"></div>
+    </div>
+    <div id="pass_confirm_div">
+        <label>Password confirm</label> <br>
+        <input type="password" name="password_confirm" class="textInput" placeholder="Enter your Password again"><br>
+        <div id="password_error"></div>
+    </div>
+    <div>
+        <input type="submit" name="register" value="Register" class="btn btn-success" onClick={}>
+
+    </div>
+    </form>
+    </div>
+</body>
+
+</html>
+<script src="f.js"></script>
